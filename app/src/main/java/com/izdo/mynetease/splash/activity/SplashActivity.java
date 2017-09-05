@@ -11,6 +11,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.izdo.mynetease.R;
 import com.izdo.mynetease.service.DownloadImageService;
+import com.izdo.mynetease.splash.bean.Action;
 import com.izdo.mynetease.splash.bean.Ads;
 import com.izdo.mynetease.splash.bean.AdsDetail;
 import com.izdo.mynetease.util.Constant;
@@ -25,7 +27,6 @@ import com.izdo.mynetease.util.ImageUtil;
 import com.izdo.mynetease.util.JsonUtil;
 import com.izdo.mynetease.util.Md5Helper;
 import com.izdo.mynetease.util.SharedPrefrencesUtil;
-import com.orhanobut.logger.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,8 +118,6 @@ public class SplashActivity extends Activity {
 
     // 获取广告数据
     public void httpRequest() {
-        Logger.i("request");
-
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -180,7 +179,7 @@ public class SplashActivity extends Activity {
             return;
         List<AdsDetail> adsDetails = ads.getAds();
         if (adsDetails != null && adsDetails.size() > 0) {
-            AdsDetail detail = adsDetails.get(index % size);
+            final AdsDetail detail = adsDetails.get(index % size);
             List<String> urls = detail.getRes_url();
             if (urls != null && !TextUtils.isEmpty(urls.get(0))) {
                 // 获取url
@@ -194,6 +193,19 @@ public class SplashActivity extends Activity {
                     ads_img.setImageBitmap(bitmap);
                     index++;
                     SharedPrefrencesUtil.saveInt(this, LAST_IMAGE_INDEX, index);
+
+                    ads_img.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Action action =  detail.getAction_params();
+                            if (action != null && !TextUtils.isEmpty(action.getLink_url())) {
+                                Intent intent = new Intent();
+                                intent.setClass(SplashActivity.this, WebViewActivity.class);
+                                intent.putExtra(WebViewActivity.ACTION_NAME, action);
+                                startActivity(intent);
+                            }
+                        }
+                    });
                 }
             }
         }

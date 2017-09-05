@@ -23,6 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".splash.activity.WebViewActivity"/>
 
         <service android:name=".service.DownloadImageService"/>
 

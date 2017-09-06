@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_splash"
     android:layout_width="match_parent"
@@ -9,7 +10,7 @@
     tools:context="com.izdo.mynetease.splash.activity.SplashActivity">
 
     <LinearLayout
-        android:id="@+id/buttom_img"
+        android:id="@+id/bottom_img"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
@@ -28,13 +29,24 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/buttom_img">
+        android:layout_above="@id/bottom_img">
+
 
         <ImageView
+            android:id="@+id/ads"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ads"
-            android:scaleType="fitXY"  />
+            android:scaleType="fitXY"/>
+
+        <com.izdo.mynetease.splash.TimeView
+            android:id="@+id/timeView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            app:innerColor="@android:color/darker_gray"
+            app:ringColor="@android:color/holo_red_dark"/>
 
     </RelativeLayout>
 

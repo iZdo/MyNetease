@@ -5,9 +5,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -17,8 +17,11 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.izdo.mynetease.MainActivity;
 import com.izdo.mynetease.R;
 import com.izdo.mynetease.service.DownloadImageService;
+import com.izdo.mynetease.splash.OnTimeClickListener;
+import com.izdo.mynetease.splash.TimeView;
 import com.izdo.mynetease.splash.bean.Action;
 import com.izdo.mynetease.splash.bean.Ads;
 import com.izdo.mynetease.splash.bean.AdsDetail;
@@ -45,12 +48,43 @@ public class SplashActivity extends Activity {
     // 广告图片
     ImageView ads_img;
 
+    private TimeView mTimeView;
+
+    // 时长3秒
+    int timeLength = 3 * 1000;
+    // 刷新间隔250毫秒
+    int space = 250;
+    // 刷新总次数
+    int frequency;
+    // 当前已刷新次数
+    int nowFrequency = 0;
+
     static final String JSON_CACHE = "ads_Json";
     static final String JSON_CACHE_TIME_OUT = "ads_Json_time_out";
     static final String JSON_CACHE_LAST_SUCCESS = "ads_Json_last_success";
     static final String LAST_IMAGE_INDEX = "img_index";
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    Handler mHandler;
+
+    private Runnable NoPhotoGoToMain = new Runnable() {
+        @Override
+        public void run() {
+            goToMain();
+        }
+    };
+
+    Runnable refreshing = new Runnable() {
+        @Override
+        public void run() {
+            // obtainMessage() 从消息池中复用
+            Message message = mHandler.obtainMessage(0);
+            message.arg1 = nowFrequency;
+            mHandler.sendMessage(message);
+            mHandler.postDelayed(this, space);
+            nowFrequency++;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +99,48 @@ public class SplashActivity extends Activity {
 
         ads_img = (ImageView) findViewById(ads);
 
+        mTimeView = (TimeView) findViewById(R.id.timeView);
+        mTimeView.setListener(new OnTimeClickListener() {
+            @Override
+            public void onClickTime(View view) {
+                // 点击之后直接跳转到MainActivity，并把定时去除
+                mHandler.removeCallbacks(refreshing);
+                goToMain();
+            }
+        });
+
+        // 总次数 = 总时长 / 间隔
+        frequency = timeLength / space;
+
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 0:
+                        int nowFrequency = msg.arg1;
+                        if (nowFrequency <= frequency) {
+                            mTimeView.setProgress(frequency, nowFrequency);
+                        } else {
+                            mHandler.removeCallbacks(refreshing);
+                            goToMain();
+                        }
+                        break;
+                }
+            }
+        };
+        mHandler.post(refreshing);
+
         getAds();
 
         showImage();
 
+    }
+
+    public void goToMain(){
+        Intent intent = new Intent();
+        intent.setClass(SplashActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     // 权限申请 6.0以上才需申请
@@ -159,6 +231,7 @@ public class SplashActivity extends Activity {
 
                 } else {
                     // 请求失败
+
                 }
             }
         });
@@ -168,46 +241,51 @@ public class SplashActivity extends Activity {
     public void showImage() {
         // 读出缓存
         String cache = SharedPrefrencesUtil.getString(this, JSON_CACHE);
-        // 读出上次显示图片的索引
-        int index = SharedPrefrencesUtil.getInt(this, LAST_IMAGE_INDEX);
 
-        // 转化成对象
-        Ads ads = JsonUtil.parseJson(cache, Ads.class);
-        int size = ads.getAds().size();
+        if (!TextUtils.isEmpty(cache)) {
+            // 读出上次显示图片的索引
+            int index = SharedPrefrencesUtil.getInt(this, LAST_IMAGE_INDEX);
 
-        if (ads == null)
-            return;
-        List<AdsDetail> adsDetails = ads.getAds();
-        if (adsDetails != null && adsDetails.size() > 0) {
-            final AdsDetail detail = adsDetails.get(index % size);
-            List<String> urls = detail.getRes_url();
-            if (urls != null && !TextUtils.isEmpty(urls.get(0))) {
-                // 获取url
-                String url = urls.get(0);
-                // 计算文件名
-                String image_name = Md5Helper.toMD5(url);
+            // 转化成对象
+            Ads ads = JsonUtil.parseJson(cache, Ads.class);
+            int size = ads.getAds().size();
 
-                File image = ImageUtil.getFileByName(image_name);
-                if (image.exists()) {
-                    Bitmap bitmap = ImageUtil.getImageBitMapByFile(image);
-                    ads_img.setImageBitmap(bitmap);
-                    index++;
-                    SharedPrefrencesUtil.saveInt(this, LAST_IMAGE_INDEX, index);
+            if (ads == null)
+                return;
+            List<AdsDetail> adsDetails = ads.getAds();
+            if (adsDetails != null && adsDetails.size() > 0) {
+                final AdsDetail detail = adsDetails.get(index % size);
+                List<String> urls = detail.getRes_url();
+                if (urls != null && !TextUtils.isEmpty(urls.get(0))) {
+                    // 获取url
+                    String url = urls.get(0);
+                    // 计算文件名
+                    String image_name = Md5Helper.toMD5(url);
 
-                    ads_img.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Action action =  detail.getAction_params();
-                            if (action != null && !TextUtils.isEmpty(action.getLink_url())) {
-                                Intent intent = new Intent();
-                                intent.setClass(SplashActivity.this, WebViewActivity.class);
-                                intent.putExtra(WebViewActivity.ACTION_NAME, action);
-                                startActivity(intent);
+                    File image = ImageUtil.getFileByName(image_name);
+                    if (image.exists()) {
+                        Bitmap bitmap = ImageUtil.getImageBitMapByFile(image);
+                        ads_img.setImageBitmap(bitmap);
+                        index++;
+                        SharedPrefrencesUtil.saveInt(this, LAST_IMAGE_INDEX, index);
+
+                        ads_img.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Action action = detail.getAction_params();
+                                if (action != null && !TextUtils.isEmpty(action.getLink_url())) {
+                                    Intent intent = new Intent();
+                                    intent.setClass(SplashActivity.this, WebViewActivity.class);
+                                    intent.putExtra(WebViewActivity.ACTION_NAME, action);
+                                    startActivity(intent);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
+        } else {
+            mHandler.postDelayed(NoPhotoGoToMain, 3000);
         }
     }
 }

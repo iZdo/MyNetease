@@ -33,6 +33,7 @@ import com.izdo.mynetease.util.SharedPrefrencesUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import okhttp3.Call;
@@ -93,6 +94,10 @@ public class SplashActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        // 沉浸式
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+
         setContentView(R.layout.activity_splash);
 
         requestPermission();
@@ -112,22 +117,8 @@ public class SplashActivity extends Activity {
         // 总次数 = 总时长 / 间隔
         frequency = timeLength / space;
 
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 0:
-                        int nowFrequency = msg.arg1;
-                        if (nowFrequency <= frequency) {
-                            mTimeView.setProgress(frequency, nowFrequency);
-                        } else {
-                            mHandler.removeCallbacks(refreshing);
-                            goToMain();
-                        }
-                        break;
-                }
-            }
-        };
+        mHandler = new MyHandler(this);
+
         mHandler.post(refreshing);
 
         getAds();
@@ -136,7 +127,13 @@ public class SplashActivity extends Activity {
 
     }
 
-    public void goToMain(){
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(refreshing);
+    }
+
+    public void goToMain() {
         Intent intent = new Intent();
         intent.setClass(SplashActivity.this, MainActivity.class);
         startActivity(intent);
@@ -273,11 +270,14 @@ public class SplashActivity extends Activity {
                             @Override
                             public void onClick(View view) {
                                 Action action = detail.getAction_params();
+                                mHandler.removeCallbacks(refreshing);
                                 if (action != null && !TextUtils.isEmpty(action.getLink_url())) {
                                     Intent intent = new Intent();
                                     intent.setClass(SplashActivity.this, WebViewActivity.class);
                                     intent.putExtra(WebViewActivity.ACTION_NAME, action);
                                     startActivity(intent);
+                                    // 关闭当前页面
+                                    finish();
                                 }
                             }
                         });
@@ -287,5 +287,40 @@ public class SplashActivity extends Activity {
         } else {
             mHandler.postDelayed(NoPhotoGoToMain, 3000);
         }
+    }
+
+    // 使用静态内部类切断访问activity 防止内存泄露
+    static class MyHandler extends Handler {
+
+        // 使用弱引用持有对象
+        WeakReference<SplashActivity> activity;
+
+        public MyHandler(SplashActivity act) {
+            this.activity = new WeakReference<SplashActivity>(act);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+
+            //获取对象
+            SplashActivity act = activity.get();
+
+            if (act == null) {
+                return;
+            }
+
+            switch (msg.what) {
+                case 0:
+                    int nowFrequency = msg.arg1;
+                    if (nowFrequency <= act.frequency) {
+                        act.mTimeView.setProgress(act.frequency, nowFrequency);
+                    } else {
+                        act.mHandler.removeCallbacks(act.refreshing);
+                        act.goToMain();
+                    }
+                    break;
+            }
+        }
+
     }
 }

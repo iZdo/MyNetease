@@ -54,7 +54,7 @@ public class TimeView extends View {
         mTextPaint = new TextPaint();
         // 抗锯齿
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextSize(10);
+        mTextPaint.setTextSize(40);
         mTextPaint.setColor(Color.WHITE);
 
         innerPaint = new Paint();

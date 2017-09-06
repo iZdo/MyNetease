@@ -1,11 +1,13 @@
 package com.izdo.mynetease.splash.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.izdo.mynetease.MainActivity;
 import com.izdo.mynetease.R;
 import com.izdo.mynetease.splash.bean.Action;
 import com.orhanobut.logger.Logger;
@@ -56,6 +58,11 @@ public class WebViewActivity extends Activity {
         if(mWebView.canGoBack()){
             mWebView.goBack();
             return;
+        }else{
+            Intent intent = new Intent();
+            intent.setClass(WebViewActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
         super.onBackPressed();
     }

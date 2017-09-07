@@ -26,21 +26,17 @@ import com.izdo.mynetease.splash.bean.Action;
 import com.izdo.mynetease.splash.bean.Ads;
 import com.izdo.mynetease.splash.bean.AdsDetail;
 import com.izdo.mynetease.util.Constant;
+import com.izdo.mynetease.util.HttpResponse;
+import com.izdo.mynetease.util.HttpUtil;
 import com.izdo.mynetease.util.ImageUtil;
 import com.izdo.mynetease.util.JsonUtil;
 import com.izdo.mynetease.util.Md5Helper;
 import com.izdo.mynetease.util.SharedPrefrencesUtil;
+import com.orhanobut.logger.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import static com.izdo.mynetease.R.id.ads;
 
@@ -95,16 +91,27 @@ public class SplashActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // 沉浸式
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        // View decorView = getWindow().getDecorView();
+        // decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
         setContentView(R.layout.activity_splash);
 
+        // 权限请求
         requestPermission();
 
+        initView();
+
+        getAds();
+
+        showImage();
+
+    }
+
+    public void initView() {
         ads_img = (ImageView) findViewById(ads);
 
         mTimeView = (TimeView) findViewById(R.id.timeView);
+        mTimeView.setVisibility(View.GONE);
         mTimeView.setListener(new OnTimeClickListener() {
             @Override
             public void onClickTime(View view) {
@@ -118,18 +125,17 @@ public class SplashActivity extends Activity {
         frequency = timeLength / space;
 
         mHandler = new MyHandler(this);
-
-        mHandler.post(refreshing);
-
-        getAds();
-
-        showImage();
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mHandler.removeCallbacks(refreshing);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         mHandler.removeCallbacks(refreshing);
     }
 
@@ -149,7 +155,6 @@ public class SplashActivity extends Activity {
             httpRequest();
         }
     }
-
 
     //获取权限
     @Override
@@ -187,35 +192,22 @@ public class SplashActivity extends Activity {
 
     // 获取广告数据
     public void httpRequest() {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url(Constant.SPLASH_URL)
-                .build();
-
-        // 开启一个异步请求
-        client.newCall(request).enqueue(new Callback() {
+        HttpUtil util = HttpUtil.getInstance();
+        util.getDate(Constant.SPLASH_URL, new HttpResponse<String>(String.class) {
             @Override
-            public void onFailure(Call call, IOException e) {
-
+            public void onError(String msg) {
+                Logger.i(msg);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    // 请求失败
-                }
-
-                // 获取接口的数据
-                String date = response.body().string();
-
-                Ads ads = JsonUtil.parseJson(date, Ads.class);
+            public void onSucceed(String json) {
+                Ads ads = JsonUtil.parseJson(json, Ads.class);
 
                 if (ads != null) {
                     // 请求成功
 
                     // 缓存json
-                    SharedPrefrencesUtil.saveString(SplashActivity.this, JSON_CACHE, date);
+                    SharedPrefrencesUtil.saveString(SplashActivity.this, JSON_CACHE, json);
                     //  缓存超时时间
                     SharedPrefrencesUtil.saveInt(SplashActivity.this, JSON_CACHE_TIME_OUT, ads.getNext_req());
                     //  缓存上次请求成功的时间
@@ -225,10 +217,6 @@ public class SplashActivity extends Activity {
                     intent.setClass(SplashActivity.this, DownloadImageService.class);
                     intent.putExtra(DownloadImageService.ADS_DATE, ads);
                     startService(intent);
-
-                } else {
-                    // 请求失败
-
                 }
             }
         });
@@ -240,6 +228,11 @@ public class SplashActivity extends Activity {
         String cache = SharedPrefrencesUtil.getString(this, JSON_CACHE);
 
         if (!TextUtils.isEmpty(cache)) {
+
+            //只有显示了广告图的情况下才显示倒数控件
+            mTimeView.setVisibility(View.VISIBLE);
+            mHandler.post(refreshing);
+
             // 读出上次显示图片的索引
             int index = SharedPrefrencesUtil.getInt(this, LAST_IMAGE_INDEX);
 
@@ -278,6 +271,7 @@ public class SplashActivity extends Activity {
                                     startActivity(intent);
                                     // 关闭当前页面
                                     finish();
+                                    mHandler.removeCallbacks(refreshing);
                                 }
                             }
                         });

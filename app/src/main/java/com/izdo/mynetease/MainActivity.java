@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 设置默认选中的页面
-        tabHost.setCurrentTabByTag("1");
+        tabHost.setCurrentTabByTag("0");
 
     }
 

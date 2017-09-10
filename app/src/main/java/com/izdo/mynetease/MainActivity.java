@@ -9,11 +9,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.izdo.mynetease.news.fragment.EmptyFragment;
 import com.izdo.mynetease.news.fragment.NewsFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    long lastBackTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,17 @@ public class MainActivity extends AppCompatActivity {
 
         return title_view;
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        long nowTime = System.currentTimeMillis();
+        if (nowTime - lastBackTime < 1000) {
+            finish();
+        } else {
+            Toast.makeText(this, "再次点击退出新闻客户端", Toast.LENGTH_SHORT).show();
+        }
+        lastBackTime = nowTime;
     }
 
 }

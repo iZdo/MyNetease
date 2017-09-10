@@ -1,6 +1,7 @@
 package com.izdo.mynetease.util;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -18,7 +19,11 @@ public class HttpUtil {
     static OkHttpClient client;
 
     private HttpUtil() {
-        client = new OkHttpClient();
+        client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
     }
 
     // 单例

@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by iZdo on 2017/9/7.
@@ -89,6 +90,14 @@ public class HotAdapter extends BaseAdapter {
         holder.reply_count.setText(detail.getReplyCount() + "跟帖");
 
         ImageLoader.getInstance().displayImage(detail.getImg(), holder.icon, mOptions);
+    }
+
+    public void addDate(List<HotDetail> add) {
+        if (mHotDetails == null) {
+            mHotDetails = new ArrayList<>();
+        }
+        mHotDetails.addAll(add);
+        notifyDataSetChanged();
     }
 
     class ViewHolder {

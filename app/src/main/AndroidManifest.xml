@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".splash.activity.WebViewActivity"/>
+        <activity android:name=".news.activity.DetailActivity"/>
 
         <service android:name=".service.DownloadImageService"/>
 

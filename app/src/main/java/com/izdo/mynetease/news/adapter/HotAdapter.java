@@ -100,6 +100,11 @@ public class HotAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public HotDetail getDateByIndex(int index) {
+        HotDetail detail = mHotDetails.get(index);
+        return detail;
+    }
+
     class ViewHolder {
         ImageView icon;
         TextView title;

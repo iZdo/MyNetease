@@ -1,5 +1,6 @@
 package com.izdo.mynetease.news.news_inner;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,12 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.izdo.mynetease.R;
+import com.izdo.mynetease.news.activity.DetailActivity;
 import com.izdo.mynetease.news.adapter.BannerAdapter;
 import com.izdo.mynetease.news.adapter.HotAdapter;
 import com.izdo.mynetease.news.bean.Banner;
@@ -102,6 +105,18 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         mListView.addHeaderView(head);
         // 添加监听
         mListView.setOnScrollListener(this);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), DetailActivity.class);
+                HotDetail detail = adapter.getDateByIndex(position - mListView.getHeaderViewsCount());
+                intent.putExtra(DetailActivity.DOCID, detail.getDocid());
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_in, R.anim.activity_out);
+            }
+        });
+
         viewpager = (ViewPager) head.findViewById(R.id.viewpager);
         viewpager.addOnPageChangeListener(this);
         bannerTitle = (TextView) head.findViewById(R.id.title);

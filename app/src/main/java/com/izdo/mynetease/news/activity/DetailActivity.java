@@ -1,6 +1,6 @@
 package com.izdo.mynetease.news.activity;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,13 +26,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.ArrayList;
+
+import me.imid.swipebacklayout.lib.SwipeBackLayout;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 
 /**
  * Created by iZdo on 2017/9/11.
  */
 
-public class DetailActivity extends Activity {
+public class DetailActivity extends SwipeBackActivity {
 
     public static final String DOCID = "doc";
     private String mDoc_id;
@@ -53,6 +56,10 @@ public class DetailActivity extends Activity {
     private TextView send;
     private RelativeLayout parent;
     private boolean hasFocus = false;
+
+    // 滑动退出
+    private SwipeBackLayout mSwipeBackLayout;
+    ArrayList<DetailWebImage> images;
 
     @JavascriptInterface
     @Override
@@ -115,7 +122,7 @@ public class DetailActivity extends Activity {
 
                     if (web != null) {
                         body = web.getBody();
-                        List<DetailWebImage> images = web.getImg();
+                        images = (ArrayList<DetailWebImage>) web.getImg();
                         for (int i = 0; i < images.size(); i++) {
                             String src = images.get(i).getSrc();
                             String imageTag = "<img src='" + src + "'onclick=\"show()\"/>";
@@ -137,6 +144,9 @@ public class DetailActivity extends Activity {
                 }
             }
         });
+
+        mSwipeBackLayout = this.getSwipeBackLayout();
+        mSwipeBackLayout.setEdgeTrackingEnabled(SwipeBackLayout.EDGE_LEFT);
     }
 
     @Override
@@ -151,14 +161,14 @@ public class DetailActivity extends Activity {
 
     @JavascriptInterface
     public void javaShow() {
-        //        Intent intent = new Intent();
-        //        intent.setClass(this,DetailImageActivity.class);
-        //        intent.putExtra("image",images);
-        //        startActivity(intent);
+        Intent intent = new Intent();
+        intent.setClass(this, DetailImageActivity.class);
+        Logger.i(images+"");
+        intent.putExtra("image", images);
+        startActivity(intent);
     }
 
     public void initWebView() {
-        Logger.i(body);
         mWebView.loadDataWithBaseURL(null, body, "text/html", "utf-8", null);
         replayCountTextView.setText(String.valueOf(replayCount));
     }
@@ -177,7 +187,6 @@ public class DetailActivity extends Activity {
             if (detailActivity == null) {
                 return;
             }
-            Logger.i("进入了");
             detailActivity.initWebView();
         }
     }

@@ -22,8 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".splash.activity.WebViewActivity"/>
-        <activity android:name=".news.activity.DetailActivity"/>
+        <activity
+            android:name=".news.activity.DetailActivity"
+            android:theme="@style/back_transparent"/>
+        <activity android:name=".news.activity.DetailImageActivity"/>
 
         <service android:name=".service.DownloadImageService"/>
 

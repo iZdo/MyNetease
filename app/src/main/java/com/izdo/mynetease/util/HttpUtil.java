@@ -38,7 +38,7 @@ public class HttpUtil {
         return util;
     }
 
-    public void getDate(String url, final HttpResponse httpResponse) {
+    public void getData(String url, final HttpResponse httpResponse) {
         Request request = new Request.Builder()
                 .url(url)
                 .build();

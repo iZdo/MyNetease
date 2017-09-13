@@ -193,7 +193,7 @@ public class SplashActivity extends Activity {
     // 获取广告数据
     public void httpRequest() {
         HttpUtil util = HttpUtil.getInstance();
-        util.getDate(Constant.SPLASH_URL, new HttpResponse<String>(String.class) {
+        util.getData(Constant.SPLASH_URL, new HttpResponse<String>(String.class) {
             @Override
             public void onError(String msg) {
                 Logger.i(msg);

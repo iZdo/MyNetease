@@ -87,7 +87,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
         initView();
 
-        getDate(true);
+        getData(true);
     }
 
     private void initCollection() {
@@ -123,7 +123,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         dots = (LinearLayout) head.findViewById(R.id.dots);
     }
 
-    private void getDate(final boolean isInit) {
+    private void getData(final boolean isInit) {
         if (isHttpRequestIng) {
             return;
         }
@@ -131,7 +131,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         HttpUtil util = HttpUtil.getInstance();
         calIndex();
         String url = Constant.getHotUrl(startIndex, endIndex);
-        util.getDate(url, new HttpResponse<Hot>(Hot.class) {
+        util.getData(url, new HttpResponse<Hot>(Hot.class) {
             @Override
             public void onError(String msg) {
                 isHttpRequestIng = false;
@@ -256,7 +256,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     public void onScrollStateChanged(AbsListView absListView, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE && isToEnd) {
             //获取更多数据
-            getDate(false);
+            getData(false);
         }
     }
 

@@ -20,7 +20,6 @@ import com.izdo.mynetease.util.Constant;
 import com.izdo.mynetease.util.HttpResponse;
 import com.izdo.mynetease.util.HttpUtil;
 import com.izdo.mynetease.util.JsonUtil;
-import com.orhanobut.logger.Logger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +98,15 @@ public class DetailActivity extends SwipeBackActivity {
 
         mWebView.getSettings().setJavaScriptEnabled(true);
         replayCountTextView = (TextView) findViewById(R.id.replayCount);
+        replayCountTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(DetailActivity.this, FeedBackActivity.class);
+                intent.putExtra(DOCID, mDoc_id);
+                startActivity(intent);
+            }
+        });
 
         mWebView.addJavascriptInterface(this, "demo");
 
@@ -107,7 +115,7 @@ public class DetailActivity extends SwipeBackActivity {
 
         HttpUtil util = HttpUtil.getInstance();
         String url = Constant.getDetailUrl(mDoc_id);
-        util.getDate(url, new HttpResponse<String>(String.class) {
+        util.getData(url, new HttpResponse<String>(String.class) {
             @Override
             public void onError(String msg) {
 
@@ -163,7 +171,6 @@ public class DetailActivity extends SwipeBackActivity {
     public void javaShow() {
         Intent intent = new Intent();
         intent.setClass(this, DetailImageActivity.class);
-        Logger.i(images+"");
         intent.putExtra("image", images);
         startActivity(intent);
     }

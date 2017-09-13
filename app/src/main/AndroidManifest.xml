@@ -26,6 +26,7 @@
             android:name=".news.activity.DetailActivity"
             android:theme="@style/back_transparent"/>
         <activity android:name=".news.activity.DetailImageActivity"/>
+        <activity android:name=".news.activity.FeedBackActivity"/>
 
         <service android:name=".service.DownloadImageService"/>
 

@@ -33,6 +33,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.srain.cube.views.ptr.PtrClassicFrameLayout;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+
 /**
  * Created by iZdo on 2017/9/6.
  */
@@ -54,7 +58,9 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     // 加载成功
     private final static int INIT_SUCCESS = 0;
     // 加载更多成功
-    private final static int UPDATE_SUCCEDD = 1;
+    private final static int UPDATE_SUCCEED = 1;
+
+    private final static int STOP_REFRESH = 2;
 
     // 轮播图相关控件
     ViewPager viewpager;
@@ -71,6 +77,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     boolean isToEnd = false;
     boolean isHttpRequestIng = false;
 
+    PtrClassicFrameLayout ptr;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,7 +86,22 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         View view = inflater.inflate(R.layout.fragment_hot, container, false);
         mListView = (ListView) view.findViewById(R.id.listView);
         RelativeLayout loading = (RelativeLayout) view.findViewById(R.id.loading);
+        ptr = (PtrClassicFrameLayout) view.findViewById(R.id.ptr);
+
         mListView.setEmptyView(loading);
+
+        // 设置刷新回调
+        ptr.setPtrHandler(new PtrDefaultHandler() {
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                getData(true);
+            }
+
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return super.checkCanDoRefresh(frame, mListView, header);
+            }
+        });
         return view;
     }
 
@@ -131,18 +154,25 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
             return;
         }
         isHttpRequestIng = true;
+        if (isInit) {
+            count = 0;
+        }
+
         HttpUtil util = HttpUtil.getInstance();
         calIndex();
         String url = Constant.getHotUrl(startIndex, endIndex);
         util.getData(url, new HttpResponse<Hot>(Hot.class) {
             @Override
             public void onError(String msg) {
+                mHandler.sendEmptyMessage(STOP_REFRESH);
                 isHttpRequestIng = false;
             }
 
             @Override
             public void onSucceed(Hot hot) {
+                mHandler.sendEmptyMessage(STOP_REFRESH);
                 isHttpRequestIng = false;
+
                 if (hot != null && hot.getT1348647909107() != null) {
                     count++;
                     List<HotDetail> details = hot.getT1348647909107();
@@ -150,7 +180,11 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                     if (isInit) {
                         HotDetail tmp_banner = details.get(0);
                         List<Banner> banners = tmp_banner.getAds();
-                        mBanners.addAll(banners);
+
+                        if (mBanners != null) {
+                            mBanners.clear();
+                            mBanners.addAll(banners);
+                        }
 
                         // 除去轮播图数据
                         details.remove(0);
@@ -158,7 +192,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
                         mHandler.sendEmptyMessage(INIT_SUCCESS);
                     } else {
-                        Message message = mHandler.obtainMessage(UPDATE_SUCCEDD);
+                        Message message = mHandler.obtainMessage(UPDATE_SUCCEED);
                         message.obj = details;
                         mHandler.sendMessage(message);
                     }
@@ -169,6 +203,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
     public void calIndex() {
         if (count == 0) {
+            startIndex = 0;
             endIndex = startIndex + 20;
 
         } else {
@@ -195,6 +230,10 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     }
 
     public void initBanner() {
+        dots.removeAllViews();
+        dot_imgs.clear();
+        views.clear();
+
         if (mBanners != null && mBanners.size() > 0) {
             for (int i = 0; i < mBanners.size(); i++) {
                 View view = inflater.inflate(R.layout.item_banner, null);
@@ -236,6 +275,10 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         int realPosition = index % size;
         //显示默认数据
         bannerTitle.setText(mBanners.get(realPosition).getTitle());
+    }
+
+    public void stopRefresh(){
+        ptr.refreshComplete();
     }
 
     @Override
@@ -290,9 +333,12 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                     hot.initDate();
                     hot.initBanner();
                     break;
-                case UPDATE_SUCCEDD:
+                case UPDATE_SUCCEED:
                     List<HotDetail> date = (List<HotDetail>) msg.obj;
                     hot.update(date);
+                case STOP_REFRESH:
+                    hot.stopRefresh();
+                    break;
                 default:
                     break;
             }

@@ -1,6 +1,8 @@
 package com.izdo.mynetease;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -25,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTabHost tabHost = (FragmentTabHost) findViewById(R.id.tab_Host);
 
+        int version = getSDKVersion();
+        if (version >= 19) {
+            ImageView image = (ImageView) findViewById(R.id.status);
+            int height = getStatusHeight(this);
+            image.getLayoutParams().height = height;
+            image.setBackgroundColor(Color.RED);
+        }
+
         // 获取tab的标题
         String[] titles = getResources().getStringArray(R.array.tab_title);
         // 背景图
@@ -44,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
         // 设置默认选中的页面
         tabHost.setCurrentTabByTag("0");
 
+    }
+
+    /**
+     * 获取SDK版本
+     */
+    public int getSDKVersion() {
+        return Build.VERSION.SDK_INT;
     }
 
     /**
@@ -71,6 +88,24 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "再次点击退出新闻客户端", Toast.LENGTH_SHORT).show();
         }
         lastBackTime = nowTime;
+    }
+
+    /**
+     * 获取状态栏的高度
+     * 通过反射获取系统状态栏的高度
+     */
+    public int getStatusHeight(Context context) {
+
+        int statusHeight = -1;
+        try {
+            Class clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            int height = Integer.parseInt(clazz.getField("status_bar_height").get(object).toString());
+            statusHeight = context.getResources().getDimensionPixelSize(height);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statusHeight;
     }
 
 }

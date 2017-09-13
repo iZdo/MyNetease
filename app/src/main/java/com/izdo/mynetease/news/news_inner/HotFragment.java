@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.izdo.mynetease.R;
@@ -76,6 +77,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
         View view = inflater.inflate(R.layout.fragment_hot, container, false);
         mListView = (ListView) view.findViewById(R.id.listView);
+        RelativeLayout loading = (RelativeLayout) view.findViewById(R.id.loading);
+        mListView.setEmptyView(loading);
         return view;
     }
 

@@ -48,10 +48,57 @@
 
     </RelativeLayout>
 
-    <FrameLayout
-        android:id="@+id/tabs"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="40dp">
+
+        <ImageView
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@drawable/biz_news_column_add_subscribe"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@id/add">
+
+            <FrameLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <RelativeLayout
+                android:id="@+id/menu_title"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@android:color/white"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="切换栏目"
+                    android:textColor="@android:color/black"/>
+
+                <Button
+                    android:layout_width="70dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/title_back_selector"
+                    android:text="排序删除"
+                    android:textColor="@color/title_color"
+                    android:textSize="12sp"/>
+
+            </RelativeLayout>
+        </FrameLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -61,6 +108,14 @@
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <FrameLayout
+            android:id="@+id/menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/p70white"
+            android:visibility="gone"/>
+
     </FrameLayout>
 
 </LinearLayout>

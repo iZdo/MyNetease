@@ -11,7 +11,7 @@ public class HotDetail {
     private List<Banner> ads;
     private String img;
     private String title;
-    String source;
+    private String source;
     private int replyCount;
     private String specialID;
     private String docid;

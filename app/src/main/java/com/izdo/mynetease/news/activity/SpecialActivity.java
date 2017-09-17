@@ -144,9 +144,7 @@ public class SpecialActivity extends Activity {
                             mItems.add(item_bean);
                         }
                     }
-
                     mHandler.sendEmptyMessage(0);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

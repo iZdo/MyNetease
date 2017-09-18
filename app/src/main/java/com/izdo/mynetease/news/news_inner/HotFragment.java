@@ -88,6 +88,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         View view = inflater.inflate(R.layout.fragment_hot, container, false);
         mListView = (ListView) view.findViewById(R.id.listView);
         RelativeLayout loading = (RelativeLayout) view.findViewById(R.id.loading);
+
         ptr = (PtrClassicFrameLayout) view.findViewById(R.id.ptr);
         // 防止下拉控件与banner左右滑动冲突
         ptr.disableWhenHorizontalMove(true);

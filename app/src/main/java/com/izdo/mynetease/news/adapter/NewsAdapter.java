@@ -31,8 +31,19 @@ public class NewsAdapter extends FragmentStatePagerAdapter {
         return mFragments.size();
     }
 
+    // 刷新ViewPager必须重写getItemPosition()方法并返回POSITION_NONE
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
     @Override
     public CharSequence getPageTitle(int position) {
         return mFragments.get(position).getTitle();
+    }
+
+    public void setData(ArrayList<FragmentInfo> mFragments) {
+        this.mFragments = mFragments;
+        notifyDataSetChanged();
     }
 }

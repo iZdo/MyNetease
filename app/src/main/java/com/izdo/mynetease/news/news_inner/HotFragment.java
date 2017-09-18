@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.izdo.mynetease.R;
 import com.izdo.mynetease.news.activity.DetailActivity;
+import com.izdo.mynetease.news.activity.SpecialActivity;
 import com.izdo.mynetease.news.adapter.BannerAdapter;
 import com.izdo.mynetease.news.adapter.HotAdapter;
 import com.izdo.mynetease.news.bean.Banner;
@@ -87,6 +89,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         mListView = (ListView) view.findViewById(R.id.listView);
         RelativeLayout loading = (RelativeLayout) view.findViewById(R.id.loading);
         ptr = (PtrClassicFrameLayout) view.findViewById(R.id.ptr);
+        // 防止下拉控件与banner左右滑动冲突
+        ptr.disableWhenHorizontalMove(true);
 
         mListView.setEmptyView(loading);
 
@@ -134,10 +138,16 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent intent = new Intent();
-                intent.setClass(getActivity(), DetailActivity.class);
                 HotDetail detail = adapter.getDateByIndex(position - mListView.getHeaderViewsCount());
-                intent.putExtra(DetailActivity.DOCID, detail.getDocid());
+                Intent intent = new Intent();
+
+                if (TextUtils.isEmpty(detail.getSpecialID())) {
+                    intent.setClass(getActivity(), DetailActivity.class);
+                    intent.putExtra(DetailActivity.DOCID, detail.getDocid());
+                } else {
+                    intent.setClass(getActivity(), SpecialActivity.class);
+                    intent.putExtra(SpecialActivity.SPECIAL_ID, detail.getSpecialID());
+                }
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.activity_in, R.anim.activity_out);
             }
@@ -277,7 +287,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         bannerTitle.setText(mBanners.get(realPosition).getTitle());
     }
 
-    public void stopRefresh(){
+    public void stopRefresh() {
         ptr.refreshComplete();
     }
 

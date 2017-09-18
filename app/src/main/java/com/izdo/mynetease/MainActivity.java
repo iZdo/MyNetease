@@ -9,23 +9,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.izdo.mynetease.news.bean.ShowTabEvent;
 import com.izdo.mynetease.news.fragment.EmptyFragment;
 import com.izdo.mynetease.news.fragment.NewsFragment;
 import com.izdo.mynetease.util.FragmentTabHost;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 public class MainActivity extends AppCompatActivity {
 
     long lastBackTime = 0;
+    FragmentTabHost tabHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentTabHost tabHost = (FragmentTabHost) findViewById(R.id.tab_Host);
+        tabHost = (FragmentTabHost) findViewById(R.id.tab_Host);
 
         int version = getSDKVersion();
         if (version >= 19) {
@@ -34,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
             image.getLayoutParams().height = height;
             image.setBackgroundColor(Color.RED);
         }
+
+        // 注册eventBus
+        EventBus.getDefault().register(this);
 
         // 获取tab的标题
         String[] titles = getResources().getStringArray(R.array.tab_title);
@@ -54,6 +64,24 @@ public class MainActivity extends AppCompatActivity {
         // 设置默认选中的页面
         tabHost.setCurrentTabByTag("0");
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showOrHideTab(ShowTabEvent event) {
+        boolean isShow = event.isShow();
+        if (!isShow) {
+            TabWidget tabWidget = tabHost.getTabWidget();
+            tabWidget.setVisibility(View.GONE);
+        } else {
+            TabWidget tabWidget = tabHost.getTabWidget();
+            tabWidget.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     /**

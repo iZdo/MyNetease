@@ -16,9 +16,10 @@ public class Constant {
 
     public static final String FEEDBACK_URL = "http://comment.api.163.com/api/json/post/list/new/hot/news3_bbs/%D/0/10/10/2/2";
 
+    public static final String Specialurl = "http://c.m.163.com/nc/special/%S.html";
+
     // 缓存文件
     public static final String CACHE = "izdoCache";
-
 
     public static String getHotUrl(int start, int end) {
         String result;
@@ -36,6 +37,12 @@ public class Constant {
     public static String getFeedbackUrl(String docid) {
         String result;
         result = FEEDBACK_URL.replace("%D", docid);
+        return result;
+    }
+
+    public static String getSpecialUrl(String specialID) {
+        String result;
+        result = Specialurl.replace("%S", specialID);
         return result;
     }
 }

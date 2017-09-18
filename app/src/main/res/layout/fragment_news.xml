@@ -87,6 +87,7 @@
                     android:textColor="@android:color/black"/>
 
                 <Button
+                    android:id="@+id/sort"
                     android:layout_width="70dp"
                     android:layout_height="35dp"
                     android:layout_alignParentRight="true"
@@ -114,8 +115,48 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/p70white"
-            android:visibility="gone"/>
+            android:visibility="gone">
 
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.izdo.mynetease.util.NoScrollGridView
+                        android:id="@+id/show"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:horizontalSpacing="10dp"
+                        android:listSelector="@android:color/transparent"
+                        android:numColumns="4"
+                        android:verticalSpacing="10dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@android:color/darker_gray"
+                        android:padding="5dp"
+                        android:text="点击添加更多栏目"
+                        android:textColor="@android:color/black"/>
+
+                    <com.izdo.mynetease.util.NoScrollGridView
+                        android:id="@+id/not_show"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:horizontalSpacing="10dp"
+                        android:listSelector="@android:color/transparent"
+                        android:numColumns="4"
+                        android:verticalSpacing="10dp"/>
+
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
     </FrameLayout>
-
 </LinearLayout>

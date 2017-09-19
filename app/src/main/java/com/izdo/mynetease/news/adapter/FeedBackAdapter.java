@@ -2,6 +2,7 @@ package com.izdo.mynetease.news.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +86,7 @@ public class FeedBackAdapter extends BaseAdapter {
                 view = mInflater.inflate(R.layout.item_feedback, null);
                 viewHolder = new ContentViewHolder();
                 viewHolder.icon = (CircleImageView) view.findViewById(R.id.profile_image);
+                viewHolder.vip = (ImageView) view.findViewById(R.id.vip_f);
                 viewHolder.name = (TextView) view.findViewById(R.id.net_name);
                 viewHolder.from = (TextView) view.findViewById(R.id.net_from);
                 viewHolder.content = (TextView) view.findViewById(R.id.content);
@@ -101,13 +103,17 @@ public class FeedBackAdapter extends BaseAdapter {
     }
 
     public void initHolder(ContentViewHolder holder, FeedBacks backs) {
-        FeedBack back =  backs.getLastData();
+        FeedBack back = backs.getLastData();
+        if (back.getVip() != null) {
+            holder.name.setTextColor(Color.parseColor("#E9BA19"));
+            holder.vip.setVisibility(View.VISIBLE);
+        }
         holder.name.setText(back.getN());
-        holder.from.setText(back.getF());
+        holder.from.setText(back.getF() + back.getT());
         holder.content.setText(back.getB());
         holder.vote.setText(back.getV());
 
-        ImageLoader.getInstance().displayImage(back.getTimg(),holder.icon,mOptions);
+        ImageLoader.getInstance().displayImage(back.getTimg(), holder.icon, mOptions);
     }
 
     // 返回页面数据的类型
@@ -133,9 +139,9 @@ public class FeedBackAdapter extends BaseAdapter {
 
     class ContentViewHolder {
         ImageView icon;
+        ImageView vip;
         TextView name;
         TextView from;
-        TextView time;
         TextView content;
         TextView vote;
     }

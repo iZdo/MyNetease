@@ -11,7 +11,7 @@
         android:layout_width="100dp"
         android:layout_height="65dp"
         android:layout_alignParentLeft="true"
-        android:paddingLeft="5dp"
+        android:padding="5dp"
         android:scaleType="fitXY"/>
 
     <TextView
@@ -25,15 +25,6 @@
         android:textSize="12sp"/>
 
     <TextView
-        android:id="@+id/source"
-        style="@style/GrayText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/img"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@id/img"/>
-
-    <TextView
         android:id="@+id/reply_count"
         style="@style/GrayText"
         android:layout_width="wrap_content"
@@ -41,15 +32,5 @@
         android:layout_alignBottom="@id/img"
         android:layout_alignParentRight="true"
         android:layout_marginRight="5dp"/>
-
-    <TextView
-        android:id="@+id/special"
-        style="@style/GrayText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/img"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp"
-        android:visibility="gone"/>
 
 </RelativeLayout>

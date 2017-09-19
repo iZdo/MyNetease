@@ -9,33 +9,27 @@
         android:id="@+id/profile_image_out"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/biz_tie_user_avater_vip_down_bg"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/vip_b"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/profile_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
             android:src="@drawable/biz_tie_user_avater_default"
-            app:civ_border_width="0dp"
-            android:layout_centerHorizontal="true"/>
+            app:civ_border_width="0dp"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/profile_image"
+            android:id="@+id/vip_f"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignLeft="@+id/profile_image"
+            android:layout_alignStart="@+id/profile_image"
+            android:layout_centerVertical="true"
             android:src="@drawable/biz_tie_user_avater_vip_up_bg"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/vip_f"/>
+            android:visibility="gone"/>
 
     </RelativeLayout>
 
@@ -54,19 +48,19 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:text="巴塞罗那"
-            android:textColor="@android:color/holo_blue_bright"
-            android:textSize="14sp" />
+            android:textColor="#3488cb"
+            android:textSize="14sp"/>
 
         <TextView
+            android:id="@+id/like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:drawablePadding="5dp"
             android:drawableRight="@drawable/biz_news_tie_support"
             android:gravity="center_vertical"
             android:text="5908"
-            android:id="@+id/like"
-            android:textColor="@android:color/darker_gray"
-            android:drawablePadding="5dp"/>
+            android:textColor="@android:color/darker_gray"/>
 
     </RelativeLayout>
 
@@ -83,7 +77,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="网易广东深圳手机网游"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10sp"/>
 
     </LinearLayout>
 
@@ -93,14 +88,15 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/form"
         android:layout_below="@id/form"
+        android:paddingRight="10dp"
         android:text="asdsadsadsad"
         android:textColor="@android:color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/content"
-        android:layout_marginTop="15dp"
-        android:background="@android:color/darker_gray" />
+        android:layout_marginTop="10dp"
+        android:background="@android:color/darker_gray"/>
 </RelativeLayout>

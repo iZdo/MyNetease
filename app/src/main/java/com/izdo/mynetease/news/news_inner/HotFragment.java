@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.izdo.mynetease.R;
 import com.izdo.mynetease.news.activity.DetailActivity;
@@ -30,6 +31,7 @@ import com.izdo.mynetease.news.bean.HotDetail;
 import com.izdo.mynetease.util.Constant;
 import com.izdo.mynetease.util.HttpResponse;
 import com.izdo.mynetease.util.HttpUtil;
+import com.orhanobut.logger.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     // 加载更多成功
     private final static int UPDATE_SUCCEED = 1;
 
+    // 停止刷新
     private final static int STOP_REFRESH = 2;
 
     // 轮播图相关控件
@@ -69,6 +72,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     BannerAdapter bAdapter;
     TextView bannerTitle;
     LinearLayout dots;
+    ArrayList<HotDetail> bannerDetails;
 
     int startIndex = 0;
     int endIndex = 0;
@@ -106,6 +110,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                 return super.checkCanDoRefresh(frame, mListView, header);
             }
         });
+
         return view;
     }
 
@@ -189,6 +194,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                     // 取出第0位包含轮播图的数据
                     if (isInit) {
                         HotDetail tmp_banner = details.get(0);
+                        Logger.i(tmp_banner.getAds()+"");
                         List<Banner> banners = tmp_banner.getAds();
 
                         if (mBanners != null) {
@@ -201,6 +207,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                         mHotDetails.addAll(details);
 
                         mHandler.sendEmptyMessage(INIT_SUCCESS);
+
                     } else {
                         Message message = mHandler.obtainMessage(UPDATE_SUCCEED);
                         message.obj = details;
@@ -226,6 +233,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     public void initDate() {
         adapter = new HotAdapter(mHotDetails, getActivity());
         mListView.setAdapter(adapter);
+
+        Toast.makeText(getContext(), "刷新成功", Toast.LENGTH_SHORT).show();
     }
 
     public void update(List<HotDetail> newDate) {
@@ -237,6 +246,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         } else {
             adapter.addDate(newDate);
         }
+
+        Toast.makeText(getContext(), "加载更多成功", Toast.LENGTH_SHORT).show();
     }
 
     public void initBanner() {
@@ -256,7 +267,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                 dots.addView(dot, p);
                 dot_imgs.add(dot);
             }
-            bAdapter = new BannerAdapter(views, mBanners);
+            bAdapter = new BannerAdapter(views, mBanners,getContext());
             viewpager.setAdapter(bAdapter);
             int half = Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2) % mBanners.size();
             viewpager.setCurrentItem(half);

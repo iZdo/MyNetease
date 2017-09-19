@@ -25,6 +25,7 @@ public class DetailImageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_image);
+
         views = new ArrayList<>();
         viewpager = (ViewPager) findViewById(R.id.viewpager);
         mImages = (ArrayList<DetailWebImage>) getIntent().getSerializableExtra("image");

@@ -1,5 +1,6 @@
 package com.izdo.mynetease.news.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,7 +27,6 @@ import com.izdo.mynetease.news.news_inner.HotFragment;
 import com.izdo.mynetease.util.NoScrollGridView;
 import com.izdo.mynetease.util.SharedPrefrencesUtil;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
-import com.orhanobut.logger.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -212,7 +212,6 @@ public class NewsFragment extends Fragment {
                         }
                         mFragments.add(info);
                     }
-                    Logger.i(mFragments.size() + "");
                     mNewsAdapter.setData(mFragments);
                     smartTabLayout.setViewPager(viewPager);
                     lastTitle = content;
@@ -280,6 +279,6 @@ public class NewsFragment extends Fragment {
         mNewsAdapter = new NewsAdapter(getFragmentManager(), mFragments);
         viewPager.setAdapter(mNewsAdapter);
         smartTabLayout.setViewPager(viewPager);
-
+        smartTabLayout.setDividerColors(Color.TRANSPARENT);
     }
 }

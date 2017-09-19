@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.izdo.mynetease.R;
@@ -14,6 +16,7 @@ import com.izdo.mynetease.util.Constant;
 import com.izdo.mynetease.util.HttpResponse;
 import com.izdo.mynetease.util.HttpUtil;
 import com.izdo.mynetease.util.JsonUtil;
+import com.orhanobut.logger.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,6 +81,9 @@ public class FeedBackActivity extends Activity {
                             String key = keys.next();
                             JSONObject everyJson = tmp.optJSONObject(key);
                             FeedBack feedBack = JsonUtil.parseJson(everyJson.toString(), FeedBack.class);
+                           // Logger.i(feedBack.getF());
+
+                            feedBack = modifyFeedBack(feedBack);
                             // 记录每一个回帖的序号
                             feedBack.setIndex(Integer.valueOf(key));
 
@@ -96,9 +102,33 @@ public class FeedBackActivity extends Activity {
         });
     }
 
+    public FeedBack modifyFeedBack(FeedBack feedBack) {
+        FeedBack newFeedBack = feedBack;
+        String username = newFeedBack.getN();
+        newFeedBack.setF(newFeedBack.getF().replace("网易", ""));
+        newFeedBack.setF(newFeedBack.getF().replace("&nbsp;", " "));
+        newFeedBack.setF(newFeedBack.getF().replace("：", " "));
+        newFeedBack.setF(newFeedBack.getF().replace(username + "", ""));
+
+        Logger.i(newFeedBack.getVip());
+
+        if(newFeedBack.getN()==null)
+            newFeedBack.setN("火星网友");
+
+        return newFeedBack;
+    }
+
     public void init() {
         mAdapter = new FeedBackAdapter(backs, this);
         mListView.setAdapter(mAdapter);
+
+        ImageView back = (ImageView) findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     static class InnerHandler extends Handler {
